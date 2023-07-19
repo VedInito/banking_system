@@ -1,12 +1,12 @@
-#ifndef INCLUDED_ACCOUNTS
-#define INCLUDED_ACCOUNTS
+#ifndef INCLUDED_SAVING_ACCOUNTS
+#define INCLUDED_SAVING_ACCOUNTS
 
 #include "utils/Color_Codes.h"
 #include "utils/Unique_Random_Number_Generator.h"
 
-class Account {
+class Saving_Account {
 public:
-  Account(long long Customer_ID, int Initial_Opening_Amount)
+  Saving_Account(long long Customer_ID, int Initial_Opening_Amount)
       : m_Customer_ID(Customer_ID), m_Current_Balance(Initial_Opening_Amount) {
 
     m_Account_Number = s_Account_Number_Generator.Get();
@@ -14,8 +14,7 @@ public:
     m_CVV_Number = s_CVV_Number_Generator.Get();
 
     m_Number_Of_Withdraw_This_Month = 0;
-    m_Activity_This_Month = 0;
-
+    m_Monthly_Interest = 0;
     m_Remaining_Day_Withdraw_Limit = sc_Withdraw_Amount_Per_Day_Upper_Bonund;
 
     m_Transaction_History.clear();
@@ -96,7 +95,6 @@ public:
     m_Current_Balance -= Withdraw_Amount;
     ++m_Number_Of_Withdraw_This_Month;
     m_Remaining_Day_Withdraw_Limit -= Withdraw_Amount;
-    m_Activity_This_Month += Withdraw_Amount;
 
     std::cout << "Successfully withdrawn: " << Withdraw_Amount
               << ". New Balance is: " << m_Current_Balance << std::endl;
@@ -108,7 +106,6 @@ public:
 
   bool Deposite(int Deposite_Amount) {
     m_Current_Balance += Deposite_Amount;
-    m_Activity_This_Month += Deposite_Amount;
 
     std::cout << GREEN << "Amount Deposited!" << RESET << std::endl;
     std::cout << Deposite_Amount << " deposited. "
@@ -119,12 +116,11 @@ public:
     return true;
   }
 
-  bool Get_Transaction_Amount(int Transaction_Amount, Account *p_Other) {
+  bool Get_Transaction_Amount(int Transaction_Amount, Saving_Account *p_Other) {
     std::cout << "Bank: " << m_Account_Number << "(Account Number)..."
               << std::endl;
 
     m_Current_Balance += Transaction_Amount;
-    m_Activity_This_Month += Transaction_Amount;
 
     std::cout << "Amount: " << Transaction_Amount << ". received..."
               << std::endl;
@@ -134,7 +130,7 @@ public:
     return true;
   }
 
-  bool Send_Transaction_To(int Transaction_Amount, Account *p_Other) {
+  bool Send_Transaction_To(int Transaction_Amount, Saving_Account *p_Other) {
     if (m_Current_Balance < Transaction_Amount) {
       std::cout << RED << "!! Insufficient Balance..." << RESET << std::endl;
       std::cout << "!! Your Account Balance is: " << m_Current_Balance << '.'
@@ -151,8 +147,6 @@ public:
 
     p_Other->Get_Transaction_Amount(Transaction_Amount, this);
 
-    m_Activity_This_Month += Transaction_Amount;
-
     return true;
   }
 
@@ -160,32 +154,26 @@ public:
   void Month_End() {
     {
       // NRV
-      int NRV_Shortfall = std::max(0, sc_Net_Relationship_Value_Per_Month -
-                                          m_Activity_This_Month) /
-                          1000;
-      int NRV_Penalty = NRV_Shortfall * 1000;
+      int NRV_Shortfall =
+          std::max(0, sc_Net_Relationship_Value_Per_Month - m_Current_Balance) *
+          sc_NRV_Rate;
 
-      if (NRV_Penalty) {
-        std::cout << BOLD_RED << "***** Lack of Activity *****" << RESET
-                  << std::endl;
-        std::cout << "NRV Penalty: " << NRV_Penalty << " charged." << std::endl;
-
-        m_Current_Balance -= NRV_Shortfall * 1000;
-      }
+      int NRV_Penalty = NRV_Shortfall * sc_Net_Relationship_Value_Fall_Penalty;
+      m_Current_Balance -= NRV_Penalty;
     }
 
-    {
-      // Add interest
-      double Interest_Rate_Per_Month = sc_Interest_Rate / 12.0;
-      int Monthly_Interest = m_Current_Balance * Interest_Rate_Per_Month;
-      m_Current_Balance += Monthly_Interest;
-    }
-
+    m_Current_Balance += m_Monthly_Interest;
+    m_Monthly_Interest = 0;
     m_Number_Of_Withdraw_This_Month = 0;
-    m_Activity_This_Month = 0;
   }
 
   void Day_End() {
+    {
+      // Add interest
+      double Interest_Rate_Per_Day = sc_Interest_Rate / 365.0;
+      double Daily_Interest = m_Current_Balance * Interest_Rate_Per_Day;
+      m_Monthly_Interest += Daily_Interest;
+    }
     m_Remaining_Day_Withdraw_Limit = sc_Withdraw_Amount_Per_Day_Upper_Bonund;
   }
 
@@ -222,6 +210,7 @@ private:
 
   static const int sc_Net_Relationship_Value_Per_Month = 100000;
   static const int sc_Net_Relationship_Value_Fall_Penalty = 1000;
+  static constexpr const double sc_NRV_Rate = 0.01;
 
   static const int sc_Free_Withdraw_Count_In_Month_Upper_Bound = 5;
   static const int sc_Monthly_Free_Withdraw_Count_Exceed_Penalty = 500;
@@ -243,8 +232,8 @@ private:
   int m_Current_Balance;
 
   int m_Number_Of_Withdraw_This_Month;
-  int m_Activity_This_Month;
   int m_Remaining_Day_Withdraw_Limit;
+  int m_Monthly_Interest;
 
   std::vector<std::pair<std::string, int>> m_Transaction_History;
 
@@ -253,16 +242,16 @@ private:
   long long m_CVV_Number;
 };
 
-Unique_Random_Number_Generator Account::s_Account_Number_Generator(
-    Account::sc_Digits_In_Account_Number,
-    Account::sc_Number_Of_Accounts_Upper_Bound);
+Unique_Random_Number_Generator Saving_Account::s_Account_Number_Generator(
+    Saving_Account::sc_Digits_In_Account_Number,
+    Saving_Account::sc_Number_Of_Accounts_Upper_Bound);
 
-Unique_Random_Number_Generator
-    Account::s_ATM_Number_Generator(Account::sc_Digits_In_ATM_Card_Number,
-                                    Account::sc_Number_Of_Accounts_Upper_Bound);
+Unique_Random_Number_Generator Saving_Account::s_ATM_Number_Generator(
+    Saving_Account::sc_Digits_In_ATM_Card_Number,
+    Saving_Account::sc_Number_Of_Accounts_Upper_Bound);
 
-Unique_Random_Number_Generator
-    Account::s_CVV_Number_Generator(Account::sc_Digits_In_CVV_Number,
-                                    Account::sc_Number_Of_Accounts_Upper_Bound);
+Unique_Random_Number_Generator Saving_Account::s_CVV_Number_Generator(
+    Saving_Account::sc_Digits_In_CVV_Number,
+    Saving_Account::sc_Number_Of_Accounts_Upper_Bound);
 
 #endif
