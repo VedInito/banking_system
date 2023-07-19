@@ -1,6 +1,7 @@
 #ifndef INCLUDED_ACCOUNTS
 #define INCLUDED_ACCOUNTS
 
+#include "utils/Color_Codes.h"
 #include "utils/Unique_Random_Number_Generator.h"
 
 class Account {
@@ -31,50 +32,59 @@ public:
 public:
   bool Withdraw(int Withdraw_Amount) {
     if (m_Current_Balance < Withdraw_Amount) {
-      std::cout << "!! Insufficient Balance" << std::endl;
+      std::cout << RED << "!! Insufficient Balance" << RESET << std::endl;
       std::cout << "Current Balance: " << m_Current_Balance << std::endl;
-      std::cout << "!! Transaction Failed..." << std::endl << std::endl;
+      std::cout << BOLD_RED << "!! Transaction Failed..." << RESET << std::endl
+                << std::endl;
 
       return false;
     }
 
     if (Withdraw_Amount > sc_Withdraw_Amount_Upper_Bound) {
       std::cout
+          << RED
           << "!! Withdraw Amount is exceeding upper bound for Withdraw Amount"
-          << std::endl;
+          << RESET << std::endl;
       std::cout << "Withdraw Amount upper bound: "
                 << sc_Withdraw_Amount_Upper_Bound << std::endl;
-      std::cout << "!! Transaction Failed..." << std::endl << std::endl;
+      std::cout << BOLD_RED << "!! Transaction Failed..." << RESET << std::endl
+                << std::endl;
 
       return false;
     }
 
     if (Withdraw_Amount > m_Remaining_Day_Withdraw_Limit) {
-      std::cout << "!! Day Withdraw Limit Exceeded" << std::endl;
+      std::cout << RED << "!! Day Withdraw Limit Exceeded" << RESET
+                << std::endl;
       std::cout << "Remaining Withdraw Limit: "
                 << m_Remaining_Day_Withdraw_Limit << std::endl;
-      std::cout << "!! Transaction Failed..." << std::endl << std::endl;
+      std::cout << BOLD_RED << "!! Transaction Failed..." << RESET << std::endl
+                << std::endl;
 
       return false;
     }
 
     if (m_Number_Of_Withdraw_This_Month >
         sc_Free_Withdraw_Count_In_Month_Upper_Bound) {
-      std::cout
-          << "! Number of Withdrawal this month exceeds Free Withdrawal count"
-          << std::endl;
-      std::cout << "! Extra Penalty will be charged" << std::endl;
+      std::cout << CYAN
+                << "! Number of Withdrawal this month exceeds Free "
+                   "Withdrawal count"
+                << RESET << std::endl;
+      std::cout << CYAN << "! Extra Penalty will be charged" << RESET
+                << std::endl;
 
       if (m_Current_Balance <
           Withdraw_Amount + sc_Monthly_Free_Withdraw_Count_Exceed_Penalty) {
-        std::cout << "!! You don't have enough balance to pay Penalty"
-                  << std::endl;
+        std::cout << RED << "!! You don't have enough balance to pay Penalty"
+                  << RESET << std::endl;
 
         std::cout << "Your Current Balance: " << m_Current_Balance
                   << "Penalty: "
                   << sc_Monthly_Free_Withdraw_Count_Exceed_Penalty << std::endl;
 
-        std::cout << "!! Transaction Failed..." << std::endl << std::endl;
+        std::cout << BOLD_RED << "!! Transaction Failed..." << RESET
+                  << std::endl
+                  << std::endl;
 
         return false;
       }
@@ -86,39 +96,73 @@ public:
     ++m_Number_Of_Withdraw_This_Month;
     m_Remaining_Day_Withdraw_Limit -= Withdraw_Amount;
 
-    std::cout << "Withdrawal Successfull!..." << std::endl << std::endl;
+    std::cout << "Successfully withdrawn: " << Withdraw_Amount
+              << ". New Balance is: " << m_Current_Balance << std::endl;
+    std::cout << BOLD_GREEN << "Withdrawal Successfull!..." << RESET
+              << std::endl
+              << std::endl;
     return true;
   }
 
   bool Deposite(int Deposite_Amount) {
     m_Current_Balance += Deposite_Amount;
 
-    std::cout << "Amount Deposited!" << std::endl;
+    std::cout << GREEN << "Amount Deposited!" << RESET << std::endl;
     std::cout << Deposite_Amount << " deposited. "
-              << "Current Balance: " << m_Current_Balance << std::endl;
-    std::cout << "Deposite Successfull!..." << std::endl << std::endl;
+              << "New Balance: " << m_Current_Balance << std::endl;
+    std::cout << BOLD_GREEN << "Deposite Successfull!..." << RESET << std::endl
+              << std::endl;
 
     return true;
   }
 
-  bool Get_Transaction_Amount_From(int Transaction_Amount, Account *Other) {
+  bool Get_Transaction_Amount(int Transaction_Amount, Account *p_Other) {
+    std::cout << "Bank: " << m_Account_Number << "(Account Number)..."
+              << std::endl;
+
+    m_Current_Balance += Transaction_Amount;
+
+    std::cout << "Amount: " << Transaction_Amount << ". received..."
+              << std::endl;
+    std::cout << BOLD_GREEN << "Transaction Successfull!" << RESET << std::endl
+              << std::endl;
+
     return true;
   }
-  bool Send_Transaction_To(int Transaction_Amount, Account *Other) {
+
+  bool Send_Transaction_To(int Transaction_Amount, Account *p_Other) {
+    if (m_Current_Balance < Transaction_Amount) {
+      std::cout << RED << "!! Insufficient Balance..." << RESET << std::endl;
+      std::cout << "!! Your Account Balance is: " << m_Current_Balance << '.'
+                << std::endl;
+      std::cout << BOLD_RED << "!! Transaction Failed..." << RESET << std::endl
+                << std::endl;
+
+      return false;
+    }
+
+    m_Current_Balance -= Transaction_Amount;
+    std::cout << "Transaction Amount: " << Transaction_Amount << ". sent..."
+              << std::endl;
+
+    p_Other->Get_Transaction_Amount(Transaction_Amount, this);
+
     return true;
   }
 
 public:
   void Dump() {
-    std::cout << "***** Dumping Account Start *****" << std::endl;
+    std::cout << CYAN << "***** Dumping Account Start *****" << RESET
+              << std::endl;
 
     std::cout << "Account Number: " << m_Account_Number << std::endl;
     std::cout << "Customer Id: " << m_Customer_ID << std::endl;
     std::cout << "ATM Card Number: " << m_ATM_Card_Number << std::endl;
     std::cout << "CVV Number: " << m_CVV_Number << std::endl;
-    std::cout << "Current Balanc: " << m_Current_Balance << std::endl;
+    std::cout << "Current Balance: " << m_Current_Balance << std::endl;
 
-    std::cout << "***** Dumping Account End *****" << std::endl << std::endl;
+    std::cout << CYAN << "***** Dumping Account End *****" << RESET << std::endl
+              << std::endl;
   }
 
 private:
@@ -151,7 +195,7 @@ private:
   int m_Number_Of_Withdraw_This_Month;
   int m_Remaining_Day_Withdraw_Limit;
 
-  std::unordered_map<std::string, int> m_Transaction_History;
+  std::vector<std::pair<std::string, int>> m_Transaction_History;
 
   long long m_Account_Number;
   long long m_ATM_Card_Number;
