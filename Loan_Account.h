@@ -6,10 +6,11 @@
 
 class Loan_Account {
 public:
-  Loan_Account(long long Customer_ID, long double Initial_Loan_Amount,
-               int Total_Balance_Of_Customer)
+  Loan_Account(long long Customer_ID, const char *Account_Type,
+               long double Initial_Loan_Amount, int Total_Balance_Of_Customer)
 
-      : m_Customer_ID(Customer_ID), m_Initial_Loan_Amount(Initial_Loan_Amount),
+      : m_Customer_ID(Customer_ID), m_Account_Type(Account_Type),
+        m_Initial_Loan_Amount(Initial_Loan_Amount),
         m_Current_Compounded_Loan_Amount(Initial_Loan_Amount) {
 
     m_Account_Number = s_Account_Number_Generator.Get();
@@ -18,7 +19,10 @@ public:
         sc_Account_Opening_Upper_Bound_In_Percent_Of_Deposite *
         Total_Balance_Of_Customer;
 
-    m_Account_Opening_Time_In_Months = 0;
+    m_Account_Duration_In_Months = 0;
+
+    m_Six_Months_Loan_Amount_Increment_Factor =
+        Six_Months_Loan_Amount_Increment_Factor_Calculator(Account_Type);
 
     std::cout << std::fixed;
   }
@@ -57,7 +61,7 @@ public:
       return false;
     }
 
-    if (m_Account_Opening_Time_In_Months < sc_Minimum_Loan_Duration_In_Months) {
+    if (m_Account_Duration_In_Months < sc_Minimum_Loan_Duration_In_Months) {
       std::cout << RED << "!! Minimum Loan Duration Critera Voilated." << RESET
                 << std::endl;
       std::cout << "Minimum Loan Duration(in Monts): "
@@ -82,10 +86,18 @@ public:
 
 public:
   void Day_End() {}
-  void Month_End() {}
+  void Month_End() {
+    ++m_Account_Duration_In_Months;
 
-  void Six_Months_End() {
-    // TODO
+    bool Six_Months_Cycle_Completed =
+        (bool)(m_Account_Duration_In_Months %
+                   sc_Interest_Update_Duration_In_Months ==
+               0);
+
+    if (Six_Months_Cycle_Completed) {
+      m_Current_Compounded_Loan_Amount *=
+          m_Six_Months_Loan_Amount_Increment_Factor;
+    }
   }
 
 public:
@@ -123,10 +135,33 @@ public:
     return true;
   }
 
+  static long double
+  Six_Months_Loan_Amount_Increment_Factor_Calculator(const char *Account_Type) {
+    long double Interest_Rate = -1;
+
+    std::string loanType(Account_Type);
+    if (loanType == "HOME") {
+      Interest_Rate = sc_Home_Loan_Interest_Rate;
+    } else if (loanType == "CAR") {
+      Interest_Rate = sc_Car_Loan_Interest_Rate;
+    } else if (loanType == "PERSONAL") {
+      Interest_Rate = sc_Personal_Loan_Interest_Rate;
+    } else {
+      std::cout << BOLD_RED << "!! Wrong Loan Type." << std::endl << std::endl;
+    }
+
+    long double Six_Months_Loan_Amount_Increment_Factor =
+        (1 + Interest_Rate / 100);
+
+    return Six_Months_Loan_Amount_Increment_Factor;
+  }
+
 private:
-  static const int sc_Home_Loan_Interest_Rate = 7;
-  static const int sc_Car_Loan_Interest_Rate = 8;
-  static const int sc_Personal_Loan_Interest_Rate = 12;
+  static constexpr long double sc_Home_Loan_Interest_Rate = 7;
+  static constexpr long double sc_Car_Loan_Interest_Rate = 8;
+  static constexpr long double sc_Personal_Loan_Interest_Rate = 12;
+
+  static const int sc_Interest_Update_Duration_In_Months = 6;
 
   static const int sc_Minimum_Age_To_Open_Account = 25;
   static const int sc_Account_Opening_Lower_Bound = 500'000;
@@ -147,6 +182,7 @@ private:
 
 private:
   long long m_Customer_ID;
+  std::string m_Account_Type;
   long double m_Initial_Loan_Amount;
 
   long long m_Account_Number;
@@ -154,7 +190,8 @@ private:
   long double m_Current_Compounded_Loan_Amount;
   long double m_Maximum_Repay_Installment;
 
-  long double m_Account_Opening_Time_In_Months;
+  long long m_Account_Duration_In_Months;
+  long double m_Six_Months_Loan_Amount_Increment_Factor;
 };
 
 Unique_Random_Number_Generator Loan_Account::s_Account_Number_Generator(

@@ -117,6 +117,8 @@ public:
   }
 
 public:
+  void Day_End() {}
+
   void Month_End() {
     {
       // NRV
@@ -132,13 +134,12 @@ public:
     m_Number_Of_Transactions_This_Month = 0;
   }
 
-  void Day_End() {}
-
 public:
   void Dump() {
     std::cout << CYAN << "***** Dumping Account Start *****" << RESET
               << std::endl;
 
+    std::cout << "Account Type: Current Account" << std::endl;
     std::cout << "Account Number: " << m_Account_Number << std::endl;
     std::cout << "Customer Id: " << m_Customer_ID << std::endl;
     std::cout << "Current Balance: " << m_Current_Balance << std::endl;

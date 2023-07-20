@@ -156,6 +156,18 @@ public:
   }
 
 public:
+  void Day_End() {
+    {
+      // Add interest
+      long double Interest_Rate_Per_Day = sc_Interest_Rate / 365.0;
+      long double Daily_Interest =
+          m_Net_Daily_Transaction * Interest_Rate_Per_Day;
+      m_Monthly_Interest += Daily_Interest;
+    }
+    m_Net_Daily_Transaction = 0;
+    m_Remaining_Day_Withdraw_Limit = sc_Withdraw_Amount_Per_Day_Upper_Bonund;
+  }
+
   void Month_End() {
     {
       // NRV
@@ -174,23 +186,12 @@ public:
     m_Number_Of_Withdraw_This_Month = 0;
   }
 
-  void Day_End() {
-    {
-      // Add interest
-      long double Interest_Rate_Per_Day = sc_Interest_Rate / 365.0;
-      long double Daily_Interest =
-          m_Net_Daily_Transaction * Interest_Rate_Per_Day;
-      m_Monthly_Interest += Daily_Interest;
-    }
-    m_Net_Daily_Transaction = 0;
-    m_Remaining_Day_Withdraw_Limit = sc_Withdraw_Amount_Per_Day_Upper_Bonund;
-  }
-
 public:
   void Dump() {
     std::cout << CYAN << "***** Dumping Account Start *****" << RESET
               << std::endl;
 
+    std::cout << "Account Type: Saving Account" << std::endl;
     std::cout << "Account Number: " << m_Account_Number << std::endl;
     std::cout << "Customer Id: " << m_Customer_ID << std::endl;
     std::cout << "ATM Card Number: " << m_ATM_Card_Number << std::endl;
