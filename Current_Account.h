@@ -157,21 +157,19 @@ public:
 
 private:
   static const int sc_Minimum_Age_To_Open_Account = 18;
-  static constexpr const long double sc_Minimum_Amount_To_Open_Account = 100000;
+  static constexpr long double sc_Minimum_Amount_To_Open_Account = 100000;
 
   static const int sc_Net_Relationship_Value_Per_Month = 500000;
-  static constexpr const long double sc_Net_Relationship_Value_Fall_Penalty =
-      5000;
-  static constexpr const double sc_NRV_Rate = 0.01;
+  static constexpr long double sc_Net_Relationship_Value_Fall_Penalty = 5000;
+  static constexpr long double sc_NRV_Rate = 0.01;
 
-  static constexpr const double sc_Transaction_Charge_Rate = 0.5;
-  static constexpr const long double sc_Maximum_Charge_Per_Transaction = 500;
+  static constexpr long double sc_Transaction_Charge_Rate = 0.5;
+  static constexpr long double sc_Maximum_Charge_Per_Transaction = 500;
   static const int sc_Number_Of_Transaction_Without_Extra_Penalty = 3;
-  static constexpr const long double sc_Extra_Penalty = 500;
+  static constexpr long double sc_Extra_Penalty = 500;
 
   static const int sc_Digits_In_Account_Number = 10;
-  static constexpr const long double sc_Number_Of_Accounts_Upper_Bound =
-      500'000;
+  static constexpr long double sc_Number_Of_Accounts_Upper_Bound = 500'000;
 
 private:
   static Unique_Random_Number_Generator s_Account_Number_Generator;

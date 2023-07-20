@@ -211,24 +211,21 @@ public:
 
 private:
   static const int sc_Minimum_Age_To_Open_Account = 0;
-  static constexpr const long double sc_Minimum_Amount_To_Open_Account = 10000;
+  static constexpr long double sc_Minimum_Amount_To_Open_Account = 10000;
 
-  static constexpr const long double sc_Interest_Rate = 6;
+  static constexpr long double sc_Interest_Rate = 6;
 
-  static constexpr const long double sc_Minimum_Opening_Amount = 10000;
+  static constexpr long double sc_Minimum_Opening_Amount = 10000;
 
-  static constexpr const long double sc_Net_Relationship_Value_Per_Month =
-      100000;
-  static constexpr const long double sc_Net_Relationship_Value_Fall_Penalty =
-      1000;
-  static constexpr const double sc_NRV_Rate = 0.01;
+  static constexpr long double sc_Net_Relationship_Value_Per_Month = 100000;
+  static constexpr long double sc_Net_Relationship_Value_Fall_Penalty = 1000;
+  static constexpr double sc_NRV_Rate = 0.01;
 
   static const int sc_Free_Withdraw_Count_In_Month_Upper_Bound = 5;
-  static constexpr const long double
-      sc_Monthly_Free_Withdraw_Count_Exceed_Penalty = 500;
-  static constexpr const long double sc_Withdraw_Amount_Upper_Bound = 20000;
-  static constexpr const long double sc_Withdraw_Amount_Per_Day_Upper_Bonund =
-      50000;
+  static constexpr long double sc_Monthly_Free_Withdraw_Count_Exceed_Penalty =
+      500;
+  static constexpr long double sc_Withdraw_Amount_Upper_Bound = 20000;
+  static constexpr long double sc_Withdraw_Amount_Per_Day_Upper_Bonund = 50000;
 
   static const int sc_Digits_In_Account_Number = 10;
   static const int sc_Digits_In_ATM_Card_Number = 16;
