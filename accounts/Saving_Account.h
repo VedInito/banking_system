@@ -8,6 +8,7 @@ class Saving_Account {
 public:
   Saving_Account(long long Customer_ID, long double Initial_Opening_Amount)
       : m_Customer_ID(Customer_ID), m_Current_Balance(Initial_Opening_Amount) {
+    m_This_Account_Type = "SAVING ACCOUNT";
 
     m_Account_Number = s_Account_Number_Generator.Get();
     m_ATM_Card_Number = s_ATM_Number_Generator.Get();
@@ -24,6 +25,7 @@ public:
   }
 
 public:
+  std::string Get_Account_Type() { return m_This_Account_Type; }
   long long Get_Account_Number() { return m_Account_Number; }
   long long Get_ATM_Number() { return m_ATM_Card_Number; }
   long long Get_Current_Balance() { return m_Current_Balance; }
@@ -191,7 +193,7 @@ public:
     std::cout << CYAN << "***** Dumping Account Start *****" << RESET
               << std::endl;
 
-    std::cout << "Account Type: Saving Account" << std::endl;
+    std::cout << "Account Type: " << m_This_Account_Type << std::endl;
     std::cout << "Account Number: " << m_Account_Number << std::endl;
     std::cout << "Customer Id: " << m_Customer_ID << std::endl;
     std::cout << "ATM Card Number: " << m_ATM_Card_Number << std::endl;
@@ -241,6 +243,8 @@ private:
 private:
   int m_Customer_ID;
   long double m_Current_Balance;
+
+  std::string m_This_Account_Type;
 
   int m_Number_Of_Withdraw_This_Month;
   long double m_Remaining_Day_Withdraw_Limit;

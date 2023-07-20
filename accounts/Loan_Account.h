@@ -6,13 +6,14 @@
 
 class Loan_Account {
 public:
-  Loan_Account(long long Customer_ID, const char *Account_Type,
+  Loan_Account(long long Customer_ID, const char *Loan_Account_Type,
                long double Initial_Loan_Amount, int Total_Balance_Of_Customer)
 
-      : m_Customer_ID(Customer_ID), m_Account_Type(Account_Type),
+      : m_Customer_ID(Customer_ID), m_Loan_Account_Type(Loan_Account_Type),
         m_Initial_Loan_Amount(Initial_Loan_Amount),
         m_Current_Compounded_Loan_Amount(Initial_Loan_Amount) {
 
+    m_This_Account_Type = "LOAN ACCOUNT";
     m_Account_Number = s_Account_Number_Generator.Get();
 
     m_Maximum_Repay_Installment =
@@ -22,12 +23,13 @@ public:
     m_Account_Duration_In_Months = 0;
 
     m_Six_Months_Loan_Amount_Increment_Factor =
-        Six_Months_Loan_Amount_Increment_Factor_Calculator(Account_Type);
+        Six_Months_Loan_Amount_Increment_Factor_Calculator(Loan_Account_Type);
 
     std::cout << std::fixed;
   }
 
 public:
+  std::string Get_Account_Type() { return m_This_Account_Type; }
   long long Get_Account_Number() { return m_Account_Number; }
   long double Get_Loan_Amount() { return m_Current_Compounded_Loan_Amount; }
   long long Get_Customer_ID() { return m_Customer_ID; }
@@ -105,7 +107,7 @@ public:
     std::cout << CYAN << "***** Dumping Account Start *****" << RESET
               << std::endl;
 
-    std::cout << "Account Type: Loan Account" << std::endl;
+    std::cout << "Account Type: " << m_This_Account_Type << std::endl;
     std::cout << "Account Number: " << m_Account_Number << std::endl;
     std::cout << "Customer Id: " << m_Customer_ID << std::endl;
     std::cout << "Current Compounded Loan Amount: "
@@ -135,11 +137,11 @@ public:
     return true;
   }
 
-  static long double
-  Six_Months_Loan_Amount_Increment_Factor_Calculator(const char *Account_Type) {
+  static long double Six_Months_Loan_Amount_Increment_Factor_Calculator(
+      const char *Loan_Account_Type) {
     long double Interest_Rate = -1;
 
-    std::string loanType(Account_Type);
+    std::string loanType(Loan_Account_Type);
     if (loanType == "HOME") {
       Interest_Rate = sc_Home_Loan_Interest_Rate;
     } else if (loanType == "CAR") {
@@ -182,10 +184,11 @@ private:
 
 private:
   long long m_Customer_ID;
-  std::string m_Account_Type;
+  std::string m_Loan_Account_Type;
   long double m_Initial_Loan_Amount;
 
   long long m_Account_Number;
+  std::string m_This_Account_Type;
 
   long double m_Current_Compounded_Loan_Amount;
   long double m_Maximum_Repay_Installment;
