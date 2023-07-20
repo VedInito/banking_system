@@ -17,6 +17,8 @@ public:
 
     m_Customer_ID = s_Customer_ID_Generator.Get();
 
+    m_Total_Balance_At_Start_Of_The_Month = 0;
+
     m_Saving_Accounts.clear();
     m_Current_Accounts.clear();
     m_Loan_Accounts.clear();
@@ -46,6 +48,33 @@ public:
     bool Add_Result = (m_Loan_Accounts.count(New_Loan_Account) == 0);
     m_Loan_Accounts.insert(New_Loan_Account);
     return Add_Result;
+  }
+
+public:
+  long double Calculate_Current_Total_Balance() {
+    long double Total_Balance = 0;
+
+    for (Saving_Account *p_Saving_Account : m_Saving_Accounts)
+      Total_Balance += p_Saving_Account->Get_Current_Balance();
+
+    for (Current_Account *p_Current_Account : m_Current_Accounts)
+      Total_Balance += p_Current_Account->Get_Current_Balance();
+
+    for (Loan_Account *p_Loan_Account : m_Loan_Accounts)
+      Total_Balance -= p_Loan_Account->Get_Loan_Amount();
+
+    return Total_Balance;
+  }
+
+  long double Get_Profit_This_Month() {
+    return Calculate_Current_Total_Balance() -
+           m_Total_Balance_At_Start_Of_The_Month;
+  }
+
+public:
+  void Day_End() {}
+  void Month_End() {
+    m_Total_Balance_At_Start_Of_The_Month = Calculate_Current_Total_Balance();
   }
 
 public:
@@ -85,6 +114,8 @@ private:
   std::string m_Home_Address;
 
   long long m_Customer_ID;
+
+  long double m_Total_Balance_At_Start_Of_The_Month;
 
   std::unordered_set<Saving_Account *> m_Saving_Accounts;
   std::unordered_set<Current_Account *> m_Current_Accounts;
