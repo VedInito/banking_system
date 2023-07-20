@@ -6,7 +6,7 @@
 
 class Saving_Account {
 public:
-  Saving_Account(long long Customer_ID, int Initial_Opening_Amount)
+  Saving_Account(long long Customer_ID, long double Initial_Opening_Amount)
       : m_Customer_ID(Customer_ID), m_Current_Balance(Initial_Opening_Amount) {
 
     m_Account_Number = s_Account_Number_Generator.Get();
@@ -19,6 +19,8 @@ public:
     m_Net_Daily_Transaction = 0;
 
     m_Transaction_History.clear();
+
+    std::cout << std::fixed;
   }
 
 public:
@@ -31,7 +33,7 @@ public:
   long long Get_ID() { return m_Account_Number; }
 
 public:
-  bool Withdraw(int Withdraw_Amount) {
+  bool Withdraw(long double Withdraw_Amount) {
     if (m_Current_Balance < Withdraw_Amount) {
       std::cout << RED << "!! Insufficient Balance" << RESET << std::endl;
       std::cout << "Current Balance: " << m_Current_Balance << std::endl;
@@ -105,7 +107,7 @@ public:
     return true;
   }
 
-  bool Deposite(int Deposite_Amount) {
+  bool Deposite(long double Deposite_Amount) {
     m_Current_Balance += Deposite_Amount;
 
     std::cout << GREEN << "Amount Deposited!" << RESET << std::endl;
@@ -117,7 +119,8 @@ public:
     return true;
   }
 
-  bool Get_Transaction_Amount(int Transaction_Amount, Saving_Account *p_Other) {
+  bool Get_Transaction_Amount(long double Transaction_Amount,
+                              Saving_Account *p_Other) {
     std::cout << "Bank: " << m_Account_Number << "(Account Number)..."
               << std::endl;
 
@@ -131,7 +134,8 @@ public:
     return true;
   }
 
-  bool Send_Transaction_To(int Transaction_Amount, Saving_Account *p_Other) {
+  bool Send_Transaction_To(long double Transaction_Amount,
+                           Saving_Account *p_Other) {
     if (m_Current_Balance < Transaction_Amount) {
       std::cout << RED << "!! Insufficient Balance..." << RESET << std::endl;
       std::cout << "!! Your Account Balance is: " << m_Current_Balance << '.'
@@ -155,11 +159,13 @@ public:
   void Month_End() {
     {
       // NRV
-      int NRV_Shortfall =
-          std::max(0, sc_Net_Relationship_Value_Per_Month - m_Current_Balance) *
+      long double NRV_Shortfall =
+          std::max((long double)0,
+                   sc_Net_Relationship_Value_Per_Month - m_Current_Balance) *
           sc_NRV_Rate;
 
-      int NRV_Penalty = NRV_Shortfall * sc_Net_Relationship_Value_Fall_Penalty;
+      long double NRV_Penalty =
+          NRV_Shortfall * sc_Net_Relationship_Value_Fall_Penalty;
       m_Current_Balance -= NRV_Penalty;
     }
 
@@ -171,8 +177,9 @@ public:
   void Day_End() {
     {
       // Add interest
-      double Interest_Rate_Per_Day = sc_Interest_Rate / 365.0;
-      double Daily_Interest = m_Net_Daily_Transaction * Interest_Rate_Per_Day;
+      long double Interest_Rate_Per_Day = sc_Interest_Rate / 365.0;
+      long double Daily_Interest =
+          m_Net_Daily_Transaction * Interest_Rate_Per_Day;
       m_Monthly_Interest += Daily_Interest;
     }
     m_Net_Daily_Transaction = 0;
@@ -198,26 +205,30 @@ public:
   static bool Check_Age(int Age) {
     return (Age >= sc_Minimum_Age_To_Open_Account);
   }
-  static bool Check_Opening_Amount(int Opening_Amount) {
+  static bool Check_Opening_Amount(long double Opening_Amount) {
     return (Opening_Amount >= sc_Minimum_Amount_To_Open_Account);
   }
 
 private:
   static const int sc_Minimum_Age_To_Open_Account = 0;
-  static const int sc_Minimum_Amount_To_Open_Account = 10000;
+  static constexpr const long double sc_Minimum_Amount_To_Open_Account = 10000;
 
-  static const int sc_Interest_Rate = 6;
+  static constexpr const long double sc_Interest_Rate = 6;
 
-  static const int sc_Minimum_Opening_Amount = 10000;
+  static constexpr const long double sc_Minimum_Opening_Amount = 10000;
 
-  static const int sc_Net_Relationship_Value_Per_Month = 100000;
-  static const int sc_Net_Relationship_Value_Fall_Penalty = 1000;
+  static constexpr const long double sc_Net_Relationship_Value_Per_Month =
+      100000;
+  static constexpr const long double sc_Net_Relationship_Value_Fall_Penalty =
+      1000;
   static constexpr const double sc_NRV_Rate = 0.01;
 
   static const int sc_Free_Withdraw_Count_In_Month_Upper_Bound = 5;
-  static const int sc_Monthly_Free_Withdraw_Count_Exceed_Penalty = 500;
-  static const int sc_Withdraw_Amount_Upper_Bound = 20000;
-  static const int sc_Withdraw_Amount_Per_Day_Upper_Bonund = 50000;
+  static constexpr const long double
+      sc_Monthly_Free_Withdraw_Count_Exceed_Penalty = 500;
+  static constexpr const long double sc_Withdraw_Amount_Upper_Bound = 20000;
+  static constexpr const long double sc_Withdraw_Amount_Per_Day_Upper_Bonund =
+      50000;
 
   static const int sc_Digits_In_Account_Number = 10;
   static const int sc_Digits_In_ATM_Card_Number = 16;
@@ -231,14 +242,14 @@ private:
 
 private:
   int m_Customer_ID;
-  int m_Current_Balance;
+  long double m_Current_Balance;
 
   int m_Number_Of_Withdraw_This_Month;
-  int m_Remaining_Day_Withdraw_Limit;
-  int m_Monthly_Interest;
+  long double m_Remaining_Day_Withdraw_Limit;
+  long double m_Monthly_Interest;
 
-  int m_Net_Daily_Transaction;
-  std::vector<std::pair<std::string, int>> m_Transaction_History;
+  long double m_Net_Daily_Transaction;
+  std::vector<std::pair<std::string, long double>> m_Transaction_History;
 
   long long m_Account_Number;
   long long m_ATM_Card_Number;

@@ -6,7 +6,7 @@
 
 class Current_Account {
 public:
-  Current_Account(long long Customer_ID, int Initial_Opening_Amount)
+  Current_Account(long long Customer_ID, long double Initial_Opening_Amount)
       : m_Customer_ID(Customer_ID), m_Current_Balance(Initial_Opening_Amount) {
 
     m_Account_Number = s_Account_Number_Generator.Get();
@@ -14,6 +14,8 @@ public:
     m_Number_Of_Transactions_This_Month = 0;
 
     m_Transaction_History.clear();
+
+    std::cout << std::fixed;
   }
 
 public:
@@ -25,9 +27,9 @@ public:
   long long Get_ID() { return m_Account_Number; }
 
 public:
-  bool Withdraw(int Withdraw_Amount) {
-    double Transaction_Charge =
-        std::min((double)sc_Maximum_Charge_Per_Transaction,
+  bool Withdraw(long double Withdraw_Amount) {
+    long double Transaction_Charge =
+        std::min(sc_Maximum_Charge_Per_Transaction,
                  Withdraw_Amount * sc_Transaction_Charge_Rate);
 
     if (m_Number_Of_Transactions_This_Month >
@@ -55,7 +57,7 @@ public:
     return true;
   }
 
-  bool Deposite(int Deposite_Amount) {
+  bool Deposite(long double Deposite_Amount) {
     m_Current_Balance += Deposite_Amount;
 
     std::cout << GREEN << "Amount Deposited!" << RESET << std::endl;
@@ -67,7 +69,7 @@ public:
     return true;
   }
 
-  bool Get_Transaction_Amount(int Transaction_Amount,
+  bool Get_Transaction_Amount(long double Transaction_Amount,
                               Current_Account *p_Other) {
     std::cout << "Transaction From: " << p_Other->Get_Account_Number()
               << ". To: " << m_Account_Number << "..." << std::endl;
@@ -82,9 +84,10 @@ public:
     return true;
   }
 
-  bool Send_Transaction_To(int Transaction_Amount, Current_Account *p_Other) {
-    double Transaction_Charge =
-        std::min((double)sc_Maximum_Charge_Per_Transaction,
+  bool Send_Transaction_To(long double Transaction_Amount,
+                           Current_Account *p_Other) {
+    long double Transaction_Charge =
+        std::min((long double)sc_Maximum_Charge_Per_Transaction,
                  Transaction_Amount * sc_Transaction_Charge_Rate);
 
     if (m_Number_Of_Transactions_This_Month >
@@ -117,11 +120,12 @@ public:
   void Month_End() {
     {
       // NRV
-      int NRV_Shortfall =
+      long double NRV_Shortfall =
           std::max(0, sc_Net_Relationship_Value_Per_Month - m_Current_Balance) *
           sc_NRV_Rate;
 
-      int NRV_Penalty = NRV_Shortfall * sc_Net_Relationship_Value_Fall_Penalty;
+      long double NRV_Penalty =
+          NRV_Shortfall * sc_Net_Relationship_Value_Fall_Penalty;
       m_Current_Balance -= NRV_Penalty;
     }
 
@@ -147,27 +151,27 @@ public:
   static bool Check_Age(int Age) {
     return (Age >= sc_Minimum_Age_To_Open_Account);
   }
-  static bool Check_Opening_Amount(int Opening_Amount) {
+  static bool Check_Opening_Amount(long double Opening_Amount) {
     return (Opening_Amount >= sc_Minimum_Amount_To_Open_Account);
   }
 
 private:
   static const int sc_Minimum_Age_To_Open_Account = 18;
-  static const int sc_Minimum_Amount_To_Open_Account = 100000;
-
-  static const int sc_Minimum_Opening_Amount = 10000;
+  static constexpr const long double sc_Minimum_Amount_To_Open_Account = 100000;
 
   static const int sc_Net_Relationship_Value_Per_Month = 500000;
-  static const int sc_Net_Relationship_Value_Fall_Penalty = 5000;
+  static constexpr const long double sc_Net_Relationship_Value_Fall_Penalty =
+      5000;
   static constexpr const double sc_NRV_Rate = 0.01;
 
   static constexpr const double sc_Transaction_Charge_Rate = 0.5;
-  static const int sc_Maximum_Charge_Per_Transaction = 500;
+  static constexpr const long double sc_Maximum_Charge_Per_Transaction = 500;
   static const int sc_Number_Of_Transaction_Without_Extra_Penalty = 3;
-  static const int sc_Extra_Penalty = 500;
+  static constexpr const long double sc_Extra_Penalty = 500;
 
   static const int sc_Digits_In_Account_Number = 10;
-  static const int sc_Number_Of_Accounts_Upper_Bound = 500'000;
+  static constexpr const long double sc_Number_Of_Accounts_Upper_Bound =
+      500'000;
 
 private:
   static Unique_Random_Number_Generator s_Account_Number_Generator;
