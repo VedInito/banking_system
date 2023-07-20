@@ -14,7 +14,7 @@ public:
         m_Current_Compounded_Loan_Amount(Initial_Loan_Amount) {
 
     m_This_Account_Type = "LOAN ACCOUNT";
-    m_Account_Number = s_Account_Number_Generator.Get();
+    m_Account_Number = sp_Account_Number_Generator->Get();
 
     m_Maximum_Repay_Installment =
         sc_Account_Opening_Upper_Bound_In_Percent_Of_Deposite *
@@ -180,7 +180,7 @@ private:
   static constexpr long double sc_Precision_Error = 1e-6;
 
 private:
-  static Unique_Random_Number_Generator s_Account_Number_Generator;
+  static Unique_Random_Number_Generator *sp_Account_Number_Generator;
 
 private:
   long long m_Customer_ID;
@@ -197,8 +197,9 @@ private:
   long double m_Six_Months_Loan_Amount_Increment_Factor;
 };
 
-Unique_Random_Number_Generator Loan_Account::s_Account_Number_Generator(
-    Loan_Account::sc_Digits_In_Account_Number,
-    Loan_Account::sc_Number_Of_Accounts_Upper_Bound);
+Unique_Random_Number_Generator *Loan_Account::sp_Account_Number_Generator =
+    new Unique_Random_Number_Generator(
+        Loan_Account::sc_Digits_In_Account_Number,
+        Loan_Account::sc_Number_Of_Accounts_Upper_Bound);
 
 #endif

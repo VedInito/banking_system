@@ -9,8 +9,8 @@ public:
   Current_Account(long long Customer_ID, long double Initial_Opening_Amount)
       : m_Customer_ID(Customer_ID), m_Current_Balance(Initial_Opening_Amount) {
 
-        m_This_Account_Type = "CURRENT_ACCOUNT";
-    m_Account_Number = s_Account_Number_Generator.Get();
+    m_This_Account_Type = "CURRENT_ACCOUNT";
+    m_Account_Number = sp_Account_Number_Generator->Get();
 
     m_Number_Of_Transactions_This_Month = 0;
 
@@ -175,7 +175,7 @@ private:
   static constexpr long double sc_Number_Of_Accounts_Upper_Bound = 500'000;
 
 private:
-  static Unique_Random_Number_Generator s_Account_Number_Generator;
+  static Unique_Random_Number_Generator *sp_Account_Number_Generator;
 
 private:
   int m_Customer_ID;
@@ -190,8 +190,9 @@ private:
   long long m_Account_Number;
 };
 
-Unique_Random_Number_Generator Current_Account::s_Account_Number_Generator(
-    Current_Account::sc_Digits_In_Account_Number,
-    Current_Account::sc_Number_Of_Accounts_Upper_Bound);
+Unique_Random_Number_Generator *Current_Account::sp_Account_Number_Generator =
+    new Unique_Random_Number_Generator(
+        Current_Account::sc_Digits_In_Account_Number,
+        Current_Account::sc_Number_Of_Accounts_Upper_Bound);
 
 #endif
