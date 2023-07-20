@@ -16,6 +16,7 @@ public:
     m_Number_Of_Withdraw_This_Month = 0;
     m_Monthly_Interest = 0;
     m_Remaining_Day_Withdraw_Limit = sc_Withdraw_Amount_Per_Day_Upper_Bonund;
+    m_Net_Daily_Transaction = 0;
 
     m_Transaction_History.clear();
   }
@@ -171,9 +172,10 @@ public:
     {
       // Add interest
       double Interest_Rate_Per_Day = sc_Interest_Rate / 365.0;
-      double Daily_Interest = m_Current_Balance * Interest_Rate_Per_Day;
+      double Daily_Interest = m_Net_Daily_Transaction * Interest_Rate_Per_Day;
       m_Monthly_Interest += Daily_Interest;
     }
+    m_Net_Daily_Transaction = 0;
     m_Remaining_Day_Withdraw_Limit = sc_Withdraw_Amount_Per_Day_Upper_Bonund;
   }
 
@@ -235,6 +237,7 @@ private:
   int m_Remaining_Day_Withdraw_Limit;
   int m_Monthly_Interest;
 
+  int m_Net_Daily_Transaction;
   std::vector<std::pair<std::string, int>> m_Transaction_History;
 
   long long m_Account_Number;
